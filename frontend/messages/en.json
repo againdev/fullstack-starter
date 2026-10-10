@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "brand": "Starter",
+    "account": "Account",
+    "login": "Sign in",
+    "language": "Language"
+  },
+  "home": {
+    "eyebrow": "Web starter",
+    "title": "A plain base for the next product.",
+    "lead": "Next.js on the front, NestJS GraphQL on the back, PostgreSQL through Prisma, Redis ready to use, and Docker for local infrastructure and production.",
+    "createAccount": "Create account",
+    "signIn": "Sign in",
+    "healthTitle": "Services",
+    "healthLoading": "Checking the API…",
+    "healthError": "API is not reachable.",
+    "api": "API",
+    "database": "PostgreSQL",
+    "redis": "Redis"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "submitting": "Please wait…",
+    "failed": "Request failed",
+    "needAccount": "Need an account?",
+    "haveAccount": "Already registered?"
+  },
+  "account": {
+    "title": "Account",
+    "loading": "Loading…",
+    "signedOut": "You are not signed in.",
+    "signIn": "Sign in",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "logout": "Sign out"
+  }
+}

@@ -1,0 +1,30 @@
+# NestJS API. Start the root stack first so the network `app-net` exists.
+#   docker compose -f backend/docker-compose.yml --env-file backend/.env up -d --build
+
+networks:
+  app-net:
+    external: true
+    name: app-net
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-backend
+    networks:
+      - app-net
+    ports:
+      - "127.0.0.1:4000:4000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      APP_ADDRESS: 0.0.0.0
+      APP_PORT: 4000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-app}
+      GRAPHQL_ENABLE_IDE: "false"
+      GRAPHQL_ENABLE_INTROSPECTION: "false"
+    restart: unless-stopped

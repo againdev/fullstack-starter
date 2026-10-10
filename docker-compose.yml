@@ -1,0 +1,126 @@
+# Infrastructure: PostgreSQL, Redis, Adminer, daily backups.
+#   docker compose --env-file backend/.env up -d
+#
+# Nginx (Linux server, host network) is opt-in:
+#   docker compose --env-file backend/.env --profile proxy up -d
+
+name: fullstack-starter
+
+networks:
+  app-net:
+    name: app-net
+
+volumes:
+  postgres_data:
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: app-postgres
+    networks:
+      - app-net
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      TZ: ${TZ:-Europe/Kyiv}
+    command:
+      - postgres
+      - -c
+      - timezone=${TZ:-Europe/Kyiv}
+      - -c
+      - max_connections=200
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/backups:/backups
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    container_name: app-redis
+    networks:
+      - app-net
+    ports:
+      - "127.0.0.1:6379:6379"
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "$$REDIS_PASSWORD" \
+          --appendonly yes \
+          --maxmemory 256mb \
+          --maxmemory-policy allkeys-lru
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redispass}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli -a "$$REDIS_PASSWORD" ping | grep PONG
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:5
+    container_name: app-adminer
+    networks:
+      - app-net
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+  postgres-backup:
+    image: postgres:17-alpine
+    container_name: app-postgres-backup
+    networks:
+      - app-net
+    environment:
+      PG_HOST: postgres
+      PG_USER: ${POSTGRES_USER:-postgres}
+      PG_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PG_DATABASE: ${POSTGRES_DB:-app}
+      TZ: ${TZ:-Europe/Kyiv}
+      BACKUP_DIR: /backups
+    volumes:
+      - ./backend/backups:/backups
+      - ./backend/backup.sh:/backup.sh:ro
+    entrypoint:
+      - sh
+      - -c
+      - |
+        chmod +x /backup.sh
+        echo "Backup scheduler: daily at 02:00 ($$TZ)"
+        while true; do
+          hour=$$(date +%H)
+          minute=$$(date +%M)
+          if [ "$$hour" = "02" ] && [ "$$minute" = "00" ]; then
+            sh /backup.sh
+            sleep 3600
+          else
+            sleep 60
+          fi
+        done
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    profiles: ["proxy"]
+    image: nginx:1.29-alpine
+    container_name: app-nginx
+    network_mode: host
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

@@ -1,0 +1,25 @@
+# Next.js. Start the root stack first so the network `app-net` exists.
+#   docker compose -f frontend/docker-compose.yml --env-file frontend/.env up -d --build
+
+networks:
+  app-net:
+    external: true
+    name: app-net
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BACKEND_INTERNAL_URL: http://backend:4000
+        NEXT_PUBLIC_GRAPHQL_URL: http://backend:4000/graphql
+    container_name: app-frontend
+    networks:
+      - app-net
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:4000
+      NEXT_PUBLIC_GRAPHQL_URL: http://backend:4000/graphql
+    restart: unless-stopped

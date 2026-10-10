@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "brand": "Starter",
+    "account": "Аккаунт",
+    "login": "Войти",
+    "language": "Язык"
+  },
+  "home": {
+    "eyebrow": "Шаблон",
+    "title": "Обычная база для следующего продукта.",
+    "lead": "Next.js спереди, NestJS и GraphQL сзади, PostgreSQL через Prisma, Redis и Docker для локальной инфраструктуры и продакшена.",
+    "createAccount": "Создать аккаунт",
+    "signIn": "Войти",
+    "healthTitle": "Сервисы",
+    "healthLoading": "Проверяем API…",
+    "healthError": "API недоступен.",
+    "api": "API",
+    "database": "PostgreSQL",
+    "redis": "Redis"
+  },
+  "auth": {
+    "loginTitle": "Вход",
+    "registerTitle": "Регистрация",
+    "name": "Имя",
+    "email": "Email",
+    "password": "Пароль",
+    "submitting": "Подождите…",
+    "failed": "Запрос не выполнился",
+    "needAccount": "Нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?"
+  },
+  "account": {
+    "title": "Аккаунт",
+    "loading": "Загрузка…",
+    "signedOut": "Вы не вошли.",
+    "signIn": "Войти",
+    "name": "Имя",
+    "email": "Email",
+    "role": "Роль",
+    "logout": "Выйти"
+  }
+}
